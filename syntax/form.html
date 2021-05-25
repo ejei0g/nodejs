@@ -1,0 +1,18 @@
+//입력한 정보를 해당 위치에 저장하고 싶다.
+//액션이 가리키는 서버로 get = ?=asdf
+// type, description
+// 쿼리스트링이 안보이게 하는법 = method="post"
+// url로 데이터를 전송하는건 한정적임.
+// get == 생략, 명시.
+// 서버의 데이터를 수정 생성 삭제할 때는 메서드 = post
+<form action="http://localhost:3000/process_create" method="post">
+	<p><input type="text" name="title"></p>
+
+	<p>
+		<textarea name="description"></textarea>
+	</p>
+
+	<p>
+		<input type="submit">
+	</p>
+</form>

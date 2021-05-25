@@ -1,0 +1,32 @@
+
+# NODEJS
+
+#JS - Data type - Number
+```
+var str = 'hello';
+str.length;
+
+'abcdefg ${args}'
+```
+
+# 똑같은 파일이지만 값을 다르게 해서 다른 페이지를 만들어서 보냄.
+
+# URL
+http://sample.org:3000/main?id=HTML&page=12
+
+- http = 통신규칙 protocol
+- host(domain)
+- port number
+- path
+### 동적페이지는 이부분을 건드림..
+- query string
+	- start = ? 약속
+	- 값 &, = 약속.
+
+# CRUD
+> nodejs = module
+
+Create 
+Read 
+Update 
+Delete
