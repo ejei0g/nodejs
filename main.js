@@ -49,11 +49,10 @@ var app = http.createServer(function(request,response){
 
 				var title = 'Welcome home';
 				var description = 'hello, node.js';
-
 				var list = templateList(filelist);
-
-				var template = templateHTML(title, list, `<h2>${title}</h2>${description}`,
-				`<a href="/create">create</a>`
+				var template = templateHTML(title, list, 
+					`<h2>${title}</h2>${description}`,
+					`<a href="/create">create</a>`
 				);
 				response.writeHead(200);//webserver 응답 잘 됐는지 성공
 				response.end(template);
@@ -61,14 +60,23 @@ var app = http.createServer(function(request,response){
 
 		} else {
 			fs.readdir('./data', function(error, filelist) {
-//				console.log(filelist);
+				console.log(filelist);
 
 				fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
 
-					var list = templateList(filelist);
-					var title = queryData.id;
+								var list = templateList(filelist);
+								var title = queryData.id;
 					var template = templateHTML(title, list, `<h2>${title}</h2>${description}`, 
-					`<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+					`<a href="/create">create</a> 
+					<a href="/update?id=${title}">update</a>
+					<form action="delete_process" method="post">
+						<input type="hidden" name="id" value="${title}">
+						<input type="submit" value="delete">
+					</form>
+
+					`
+					//delete 는 link으로하면안됨 form 추천
+					//<a href="/delete?id=${title}">delete</a>
 
 					);
 					response.writeHead(200);//webserver 응답 잘 됐는지 성공
@@ -81,28 +89,20 @@ var app = http.createServer(function(request,response){
 	} else if (pathname === '/create') {
 			fs.readdir('./data', function(error, filelist) {
 //				console.log(filelist);
-
 				var title = 'WEB - create ';
 				//var description = 'hello, node.js';
-
 				var list = templateList(filelist);
-
 				var template = templateHTML(title, list,`
-
-<form action="http://localhost:3000/create_process" method="post">
-	<p><input type="text" name="title" placeholder='title'></p>
-
+<form action="/create_process" method="post">
+	<p><input type="text" name="title" placeholder="title"></p>
 	<p>
 		<textarea name="description" placeholder='description'></textarea>
 	</p>
-
 	<p>
 		<input type="submit">
 	</p>
 </form>
-
-				`, 
-
+				`,
 				''
 				);
 				response.writeHead(200);//webserver 응답 잘 됐는지 성공
@@ -131,12 +131,82 @@ var app = http.createServer(function(request,response){
 			//console.log(post.description);
 
 			fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-				response.writeHead(302, {Location: `/?id=${title}`});//webserver 응답 잘 됐는지 성공
+				response.writeHead(302, {Location: `/?id=${title}`});//webserver redirect 응답 잘 됐는지 성공
 				response.end('success');
 
 			});
 		});
 
+	} else if(pathname === '/update') {
+
+			fs.readdir('./data', function(error, filelist) {
+				console.log(filelist);
+
+				fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+
+					var list = templateList(filelist);
+					var title = queryData.id;
+					var template = templateHTML(title, list,
+									`
+<form action="/update_process" method="post">
+	<input type="hidden" name="id" value="${title}">
+	<p><input type="text" name="title" placeholder='title' value="${title}"></p>
+	<p>
+		<textarea name="description" placeholder='description'>${description}</textarea>
+	</p>
+	<p>
+		<input type="submit">
+	</p>
+</form>
+									`,
+
+					`<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+
+					);
+					response.writeHead(200);//webserver 응답 잘 됐는지 성공
+					response.end(template);
+				});
+			});
+	} else if(pathname === '/update_process') {
+		var body = '';
+		request.on('data', function(data) {
+			body = body + data; //body data에다가 콜백함수가 실행될때마다 데이터를 추가해줌.
+
+		});
+		request.on('end', function() {
+			var post = qs.parse(body); //지금까지 저장한 바디를 입력값으로 주면.
+			var id = post.id;
+			var title = post.title;
+			var description = post.description;
+
+			console.log(post);
+			//nodejs file rename
+			fs.rename(`data/${id}`, `data/${title}`, function(err){
+							fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+								response.writeHead(302, {Location: `/?id=${title}`});//webserver redirect 응답 잘 됐는지 성공
+								response.end();
+							});
+
+			});
+
+		});
+	} else if(pathname === '/delete_process') {
+					//nodejs delete file | fs.unlink
+		var body = '';
+		request.on('data', function(data) {
+			body = body + data; //body data에다가 콜백함수가 실행될때마다 데이터를 추가해줌.
+
+		});
+		request.on('end', function() {
+			var post = qs.parse(body); //지금까지 저장한 바디를 입력값으로 주면.
+			var id = post.id;
+			fs.unlink(`data/${id}`, function(err){
+								response.writeHead(302, {Location: `/`});//webserver redirect 응답 잘 됐는지 성공
+								response.end();
+
+											});
+
+		});
 	} else {
 		response.writeHead(404);//webserver 응답 잘 됐는지 성공
 		response.end('not found');
