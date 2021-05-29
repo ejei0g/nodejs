@@ -1,4 +1,4 @@
-[![jaeskim's 42 stats](https://badge42.herokuapp.com/api/stats/intra_id)](https://github.com/JaeSeoKim/badge42)
+[![jaeylee's 42 stats](https://badge42.herokuapp.com/api/stats/jaeylee)](https://github.com/JaeSeoKim/badge42)
 # NODEJS
 
 #JS - Data type - Number
